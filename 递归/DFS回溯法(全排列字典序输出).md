@@ -99,3 +99,108 @@ $$
 （每次排列打印需 O(n)，总共 n! 个排列）
 
 ---
+
+
+### 🧠 问题简述
+
+你给我一个**由不同小写字母组成的字符串**（长度 2\~8），比如 `"abc"`，我要输出它的**所有字母排列**（即全排列），并且要求**按字典序从小到大**输出。
+
+---
+
+## ✅ 解题思路：回溯法（DFS）生成全排列
+
+这个问题是**排列组合中的全排列问题**，我们要做的是：
+
+* 把所有字符的排列枚举出来（用**回溯法/深度优先搜索**）
+* 在每一层选择还没有使用过的字符
+* 最后输出排列时按**字典序**排好
+
+---
+
+### 🎯 为什么选 DFS（深度优先搜索）？
+
+因为我们要一条路一条路构建排列，每次选一个字符放进“排列路径”，再递归往下选择，直到长度和输入字符串一样为止。
+
+---
+
+## ✅ C++ 实现（带注释）
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+string s;            // 输入字符串
+vector<bool> used;   // 用于标记哪些字符已经用过
+string path;         // 当前构建的排列路径
+vector<string> res;  // 所有排列结果
+
+void dfs(int depth) {
+    if (depth == s.size()) {
+        res.push_back(path);
+        return;
+    }
+
+    for (int i = 0; i < s.size(); ++i) {
+        if (!used[i]) {
+            used[i] = true;
+            path.push_back(s[i]);
+
+            dfs(depth + 1);
+
+            path.pop_back();      // 回溯
+            used[i] = false;
+        }
+    }
+}
+
+int main() {
+    cin >> s;
+    sort(s.begin(), s.end());    // 字符排序，确保生成的是字典序顺序
+
+    used = vector<bool>(s.size(), false);
+    dfs(0);
+
+    for (const auto &perm : res) {
+        cout << perm << endl;
+    }
+
+    return 0;
+}
+```
+
+---
+
+## 🧪 输入输出示例
+
+输入：
+
+```
+abc
+```
+
+输出（按字典序）：
+
+```
+abc
+acb
+bac
+bca
+cab
+cba
+```
+
+---
+
+## 🧠 核心点回顾
+
+| 操作                         | 原因                  |
+| -------------------------- | ------------------- |
+| `sort(s.begin(), s.end())` | 保证回溯时从小字符开始，确保结果字典序 |
+| `used[i]`                  | 避免一个字符重复出现在同一个排列中   |
+| `dfs(depth + 1)`           | 递归推进，直到构成一个完整排列     |
+| `path.pop_back()`          | 回溯，撤销选择，尝试下一个字符     |
+
+---
+
